@@ -72,20 +72,25 @@ pipeline {
             steps {
               echo "Running on node: ${NODE_NAME}"
               echo 'Build Image'
-              sh '''#! /bin/bash
-                    docker build \
-                      --tag iglocal/glibc-builder:latest .
-                 '''
+              sh "docker build --tag iglocal/glibc-builder:latest ."
               echo 'Build glibc'
-              sh '''#! /bin/bash
+              sh '''#!/bin/bash
                     docker run \
                       --rm --env GLIBC_VERSION --env STDOUT=1 \
                       iglocal/glibc-builder:latest > glibc-bin-$GLIBC_VERSION-$(arch).tar.gz
                  '''
               echo 'Cleanup and upload glibc-bin-$GLIBC_VERSION-$(arch).tar.gz to Github release'
-              sh '''#! /bin/bash
+              sh '''#!/bin/bash
+                    docker rmi \
+                      iglocal/glibc-builder:latest
+                    
+                    sha512sum glibc-bin-$GLIBC_VERSION-$(arch).tar.gz > glibc-bin-$GLIBC_VERSION-$(arch).tar.gz.sha512sum
                     RELEASE_ID=$(curl -s "https://api.github.com/repos/imagegenius/docker-glibc-builder/releases/tags/$GIT_RELEASE" | jq '.id')
-                    curl -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/gzip" --data-binary "@glibc-bin-$GLIBC_VERSION-$(arch).tar.gz" "https://uploads.github.com/repos/imagegenius/docker-glibc-builder/releases/$RELEASE_ID/assets?name=glibc-bin-$GLIBC_VERSION-$(arch).tar.gz
+
+                    for i in "tar.gz" "tar.gz.sha512sum"; do
+                      UPLOAD_FILE=glibc-bin-$GLIBC_VERSION-$(arch).$i
+                      curl -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/gzip" --data-binary "@$UPLOAD_FILE" "https://uploads.github.com/repos/imagegenius/docker-glibc-builder/releases/$RELEASE_ID/assets?name=$UPLOAD_FILE"
+                    done
                  '''
             }
           }
