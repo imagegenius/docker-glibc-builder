@@ -1,2 +1,6 @@
 .git
-*.gz
+.gitignore
+.github
+.gitattributes
+READMETEMPLATE.md
+README.md
