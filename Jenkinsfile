@@ -99,6 +99,20 @@ pipeline {
     }
   }
   post {
+    always {
+      script{
+        if (currentBuild.currentResult == "SUCCESS"){
+          sh ''' curl -X POST -H "Content-Type: application/json" --data '{"avatar_url": "https://wiki.jenkins.io/JENKINS/attachments/2916393/57409617.png","embeds": [{"color": 1681177,\
+                 "description": "**docker-glibc-builder Build '${BUILD_NUMBER}' Results**\\n**Status:**  Success\\n**Job:** '${RUN_DISPLAY_URL}'\\n"}],\
+                 "username": "Jenkins"}' ${BUILDS_DISCORD} '''
+        }
+        else {
+          sh ''' curl -X POST -H "Content-Type: application/json" --data '{"avatar_url": "https://wiki.jenkins.io/JENKINS/attachments/2916393/57409617.png","embeds": [{"color": 16711680,\
+                 "description": "**docker-glibc-builder Build '${BUILD_NUMBER}' Results**\\n**Status:**  failure\\n**Job:** '${RUN_DISPLAY_URL}'\\n"}],\
+                 "username": "Jenkins"}' ${BUILDS_DISCORD} '''
+        }
+      }
+    }
     cleanup {
       cleanWs()
     }

@@ -1,10 +1,14 @@
 FROM ubuntu
-LABEL maintainer="Sasha Gerrand <github+docker-glibc-builder@sgerrand.com>"
+
+LABEL maintainer="hydazz"
+
+# environment settings
 ENV DEBIAN_FRONTEND=noninteractive \
-    GLIBC_VERSION=2.36 \
     PREFIX_DIR=/usr/glibc-compat
-RUN apt-get -q update \
-  && apt-get -qy install \
+
+RUN \
+  apt-get update && \
+  apt-get install -y \
     bison \
     build-essential \
     gawk \
@@ -13,6 +17,7 @@ RUN apt-get -q update \
     python3 \
     texinfo \
     wget
-COPY configparams /glibc-build/configparams
-COPY builder /builder
+
+COPY root/ /
+
 ENTRYPOINT ["/builder"]

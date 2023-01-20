@@ -1,15 +1,7 @@
 # docker-glibc-builder
 
-A glibc binary package builder in Docker. Produces a glibc binary package that can be imported into a rootfs to run applications dynamically linked against glibc.
+[![Jenkins Build](https://img.shields.io/jenkins/build?labelColor=555555&logoColor=ffffff&style=for-the-badge&jobUrl=https%3A%2F%2Fci.imagegenius.io%2Fjob%2FTools%2Fjob%2Fdocker-glibc-builder%2F&logo=jenkins)](https://ci.imagegenius.io/job/Tools/job/docker-glibc-builder/)
 
-## Usage
+This is a modified version of [sgerrand/docker-glibc-builder](https://github.com/sgerrand/docker-glibc-builder) that automatically builds a glibc binary package for `x86_64` AND `aarch64` for use in alpine docker images.
 
-Build a glibc package based on version 2.36 with a prefix of `/usr/glibc-compat`:
-
-    docker run --rm --env STDOUT=1 sgerrand/glibc-builder 2.36 /usr/glibc-compat > glibc-bin.tar.gz
-
-You can also keep the container around and copy out the resulting file:
-
-    docker run --name glibc-binary sgerrand/glibc-builder 2.36 /usr/glibc-compat
-    docker cp glibc-binary:/glibc-bin-2.36.tar.gz ./
-    docker rm glibc-binary
+These binaries are then used by [imagegenius/aports](https://github.com/imagegenius/aports) to build glibc packages for `x86_64` and `aarch64` and are available in a [docker baseimage](https://github.com/imagegenius/docker-baseimage-alpine-glibc) and as alpine packages in the [imagegenius repo](https://packages.imagegenius.io/).
