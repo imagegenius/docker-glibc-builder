@@ -41,14 +41,14 @@ pipeline {
         sh '''curl -H "Authorization: token ${GITHUB_TOKEN}" -X POST https://api.github.com/repos/imagegenius/docker-glibc-builder/git/tags \
         -d '{"tag":"'${GIT_RELEASE}'",\
              "object": "'${COMMIT_SHA}'",\
-             "message": "Tagging Release '${COMMIT_SHA}' to master",\
+             "message": "Tagging Release '${COMMIT_SHA}' to main",\
              "type": "commit",\
              "tagger": {"name": "ImageGenius Jenkins","email": "ci@imagegenius.io","date": "'${GITHUB_DATE}'"}}' '''
         echo "Pushing New release for Tag"
         sh '''#! /bin/bash
               echo "Updating to ${GIT_RELEASE}" > releasebody.json
               echo '{"tag_name":"'${GIT_RELEASE}'",\
-                     "target_commitish": "master",\
+                     "target_commitish": "main",\
                      "name": "'${GIT_RELEASE}'",\
                      "body": "**ImageGenius Changes:**\\n\\n'${IG_RELEASE_NOTES}'\\n\\n**Remote Changes:**\\n\\n' > start
               printf '","draft": false,"prerelease": false}' >> releasebody.json
