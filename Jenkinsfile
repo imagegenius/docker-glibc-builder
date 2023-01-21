@@ -75,52 +75,73 @@ pipeline {
       }
     }
     stage('Build-Multi') {
-      matrix {
-        axes {
-          axis {
-            name 'MATRIXARCH'
-            values 'X86-64-MULTI', 'ARM64'
+      parallel {
+        stage('Build X86') {
+          steps {
+            echo 'Build Image'
+            sh "docker build --tag ${IMAGE}:amd64-${META_TAG} ."
+            echo 'Build glibc'
+            sh '''#!/bin/bash
+                  docker run \
+                    --rm --env EXT_RELEASE --env STDOUT=1 \
+                    {IMAGE}:amd64-${META_TAG} > glibc-bin-${EXT_RELEASE}-x86_64.tar.gz
+               '''
+            echo 'Upload files to Github release'
+            sh '''#!/bin/bash
+                  sha512sum glibc-bin-${EXT_RELEASE}-x86_64.tar.gz > glibc-bin-${EXT_RELEASE}-x86_64.tar.gz.sha512sum
+                  RELEASE_ID=$(curl -s "https://api.github.com/repos/${IG_USER}/${IG_REPO}/releases/tags/${EXT_RELEASE}" | jq '.id')
+                  for file in "tar.gz" "tar.gz.sha512sum"; do
+                    UPLOAD_FILE=glibc-bin-${EXT_RELEASE}-x86_64.${file}
+                    curl -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/gzip" --data-binary "@${UPLOAD_FILE}" "https://uploads.github.com/repos/${IG_USER}/${IG_REPO}/releases/${RELEASE_ID}/assets?name=${UPLOAD_FILE}"
+                  done
+               '''
+            echo 'Cleanup'
+            sh '''#!/bin/bash
+                  for file in "tar.gz" "tar.gz.sha512sum"; do
+                    DELETEFILE=glibc-bin-${EXT_RELEASE}-x86_64.${file}
+                    rm ${DELETEFILE}
+                  done
+                  docker rmi \
+                    {IMAGE}:amd64-${META_TAG} || :
+               '''
           }
         }
-        stages {
-          stage ('Build') {
-            agent {
-              label "${MATRIXARCH}"
-            }
-            steps {
-              echo "Running on node: ${NODE_NAME}"
-              echo 'Build Image'
-              sh "docker build --tag ${IMAGE}:${META_TAG} ."
-              echo 'Build glibc'
-              sh '''#!/bin/bash
-                    docker run \
-                      --rm --env EXT_RELEASE --env STDOUT=1 \
-                      ${IMAGE}:${META_TAG} > glibc-bin-${EXT_RELEASE}-$(arch).tar.gz
-                 '''
-              echo 'Upload files to Github release'
-              sh '''#!/bin/bash
-                    sha512sum glibc-bin-${EXT_RELEASE}-$(arch).tar.gz > glibc-bin-${EXT_RELEASE}-$(arch).tar.gz.sha512sum
-                    RELEASE_ID=$(curl -s "https://api.github.com/repos/${IG_USER}/${IG_REPO}/releases/tags/$GIT_RELEASE" | jq '.id')
-                    for file in "tar.gz" "tar.gz.sha512sum"; do
-                      UPLOAD_FILE=glibc-bin-${EXT_RELEASE}-$(arch).${file}
-                      curl -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/gzip" --data-binary "@${UPLOAD_FILE}" "https://uploads.github.com/repos/${IG_USER}/${IG_REPO}/releases/${RELEASE_ID}/assets?name=${UPLOAD_FILE}"
-                    done
-                 '''
-              echo 'Cleanup'
-              sh '''#!/bin/bash
-                    for file in "tar.gz" "tar.gz.sha512sum"; do
-                      DELETEFILE=glibc-bin-${EXT_RELEASE}-$(arch).${file}
-                      rm ${DELETEFILE}
-                    done
-                    docker rmi \
-                      ${IMAGE}:${META_TAG} || :
-                 '''
-            }
+        stage('Build ARM64') {
+          agent {
+            label 'ARM64'
+          }
+          steps {
+            echo "Running on node: ${NODE_NAME}"
+            echo 'Build Image'
+            sh "docker build --tag ${IMAGE}:arm64v8-${META_TAG} ."
+            echo 'Build glibc'
+            sh '''#!/bin/bash
+                  docker run \
+                    --rm --env EXT_RELEASE --env STDOUT=1 \
+                    ${IMAGE}:arm64v8-${META_TAG} > glibc-bin-${EXT_RELEASE}-aarch64.tar.gz
+               '''
+            echo 'Upload files to Github release'
+            sh '''#!/bin/bash
+                  sha512sum glibc-bin-${EXT_RELEASE}-aarch64.tar.gz > glibc-bin-${EXT_RELEASE}-aarch64.tar.gz.sha512sum
+                  RELEASE_ID=$(curl -s "https://api.github.com/repos/${IG_USER}/${IG_REPO}/releases/tags/${EXT_RELEASE}" | jq '.id')
+                  for file in "tar.gz" "tar.gz.sha512sum"; do
+                    UPLOAD_FILE=glibc-bin-${EXT_RELEASE}-aarch64.${file}
+                    curl -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/gzip" --data-binary "@${UPLOAD_FILE}" "https://uploads.github.com/repos/${IG_USER}/${IG_REPO}/releases/${RELEASE_ID}/assets?name=${UPLOAD_FILE}"
+                  done
+               '''
+            echo 'Cleanup'
+            sh '''#!/bin/bash
+                  for file in "tar.gz" "tar.gz.sha512sum"; do
+                    DELETEFILE=glibc-bin-${EXT_RELEASE}-aarch64.${file}
+                    rm ${DELETEFILE}
+                  done
+                  docker rmi \
+                    ${IMAGE}:arm64v8-${META_TAG} || :
+               '''
           }
         }
       }
     }
-  }
   post {
     always {
       script{
