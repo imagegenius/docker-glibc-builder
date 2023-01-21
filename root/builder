@@ -3,7 +3,7 @@
 set -eo pipefail; [[ "$TRACE" ]] && set -x
 
 main() {
-	declare version="${1:-$GLIBC_VERSION}" prefix="${2:-$PREFIX_DIR}"
+	declare version="${1:-$EXT_RELEASE}" prefix="${2:-$PREFIX_DIR}"
 
 	: "${version:?}" "${prefix:?}"
 
