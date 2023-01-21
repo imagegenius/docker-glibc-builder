@@ -84,7 +84,7 @@ pipeline {
             sh '''#!/bin/bash
                   docker run \
                     --rm --env EXT_RELEASE --env STDOUT=1 \
-                    {IMAGE}:amd64-${META_TAG} > glibc-bin-${EXT_RELEASE}-x86_64.tar.gz
+                    ${IMAGE}:amd64-${META_TAG} > glibc-bin-${EXT_RELEASE}-x86_64.tar.gz
                '''
             echo 'Upload files to Github release'
             sh '''#!/bin/bash
