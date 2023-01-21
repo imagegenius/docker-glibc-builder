@@ -36,7 +36,7 @@ pipeline {
         }
         script{
           env.IG_TAG_NUMBER = sh(
-            script: '''#! /bin/bash
+            script: '''#!/bin/bash
                        tagsha=$(git rev-list -n 1 ${IG_RELEASE} 2>/dev/null)
                        if [ "${tagsha}" == "${COMMIT_SHA}" ]; then
                          echo ${IG_RELEASE_NUMBER}
@@ -63,7 +63,7 @@ pipeline {
              "type": "commit",\
              "tagger": {"name": "ImageGenius Jenkins","email": "ci@imagegenius.io","date": "'${GITHUB_DATE}'"}}' '''
         echo "Pushing New release for Tag"
-        sh '''#! /bin/bash
+        sh '''#!/bin/bash
               echo "Updating to ${EXT_RELEASE}" > releasebody.json
               echo '{"tag_name":"'${META_TAG}'",\
                      "target_commitish": "main",\
