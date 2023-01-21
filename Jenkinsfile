@@ -89,7 +89,7 @@ pipeline {
             echo 'Upload files to Github release'
             sh '''#!/bin/bash
                   sha512sum glibc-bin-${EXT_RELEASE}-x86_64.tar.gz > glibc-bin-${EXT_RELEASE}-x86_64.tar.gz.sha512sum
-                  RELEASE_ID=$(curl -s "https://api.github.com/repos/${IG_USER}/${IG_REPO}/releases/tags/${EXT_RELEASE}" | jq '.id')
+                  RELEASE_ID=$(curl -s "https://api.github.com/repos/${IG_USER}/${IG_REPO}/releases/tags/${META_TAG}" | jq '.id')
                   for file in "tar.gz" "tar.gz.sha512sum"; do
                     UPLOAD_FILE=glibc-bin-${EXT_RELEASE}-x86_64.${file}
                     curl -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/gzip" --data-binary "@${UPLOAD_FILE}" "https://uploads.github.com/repos/${IG_USER}/${IG_REPO}/releases/${RELEASE_ID}/assets?name=${UPLOAD_FILE}"
@@ -102,7 +102,7 @@ pipeline {
                     rm ${DELETEFILE}
                   done
                   docker rmi \
-                    {IMAGE}:amd64-${META_TAG} || :
+                    ${IMAGE}:amd64-${META_TAG} || :
                '''
           }
         }
@@ -123,7 +123,7 @@ pipeline {
             echo 'Upload files to Github release'
             sh '''#!/bin/bash
                   sha512sum glibc-bin-${EXT_RELEASE}-aarch64.tar.gz > glibc-bin-${EXT_RELEASE}-aarch64.tar.gz.sha512sum
-                  RELEASE_ID=$(curl -s "https://api.github.com/repos/${IG_USER}/${IG_REPO}/releases/tags/${EXT_RELEASE}" | jq '.id')
+                  RELEASE_ID=$(curl -s "https://api.github.com/repos/${IG_USER}/${IG_REPO}/releases/tags/${META_TAG}" | jq '.id')
                   for file in "tar.gz" "tar.gz.sha512sum"; do
                     UPLOAD_FILE=glibc-bin-${EXT_RELEASE}-aarch64.${file}
                     curl -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/gzip" --data-binary "@${UPLOAD_FILE}" "https://uploads.github.com/repos/${IG_USER}/${IG_REPO}/releases/${RELEASE_ID}/assets?name=${UPLOAD_FILE}"
@@ -148,12 +148,12 @@ pipeline {
       script{
         if (currentBuild.currentResult == "SUCCESS"){
           sh ''' curl -X POST -H "Content-Type: application/json" --data '{"avatar_url": "https://wiki.jenkins.io/JENKINS/attachments/2916393/57409617.png","embeds": [{"color": 1681177,\
-                 "description": "**${IG_REPO} Build '${BUILD_NUMBER}' Results**\\n**Status:**  Success\\n**Job:** '${RUN_DISPLAY_URL}'\\n"}],\
+                 "description": "**'${IG_REPO}'**\\n**Build**  '${BUILD_NUMBER}'\\n**Status:**  Success\\n**Job:** '${RUN_DISPLAY_URL}'\\n"}],\
                  "username": "Jenkins"}' ${BUILDS_DISCORD} '''
         }
         else {
           sh ''' curl -X POST -H "Content-Type: application/json" --data '{"avatar_url": "https://wiki.jenkins.io/JENKINS/attachments/2916393/57409617.png","embeds": [{"color": 16711680,\
-                 "description": "**${IG_REPO} Build '${BUILD_NUMBER}' Results**\\n**Status:**  failure\\n**Job:** '${RUN_DISPLAY_URL}'\\n"}],\
+                 "description": "**'${IG_REPO}'**\\n**Build**  '${BUILD_NUMBER}'\\n**Status:**  Failure\\n**Job:** '${RUN_DISPLAY_URL}'\\n"}],\
                  "username": "Jenkins"}' ${BUILDS_DISCORD} '''
         }
       }

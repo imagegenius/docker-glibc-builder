@@ -4,4 +4,6 @@
 
 This is a modified version of [sgerrand/docker-glibc-builder](https://github.com/sgerrand/docker-glibc-builder) that automatically builds a glibc binary package for `x86_64` AND `aarch64` for use in alpine docker images.
 
+Compiled packages are published in a [release](https://github.com/imagegenius/docker-glibc-builder/releases) - available for anyone to use.
+
 These binaries are then used by [imagegenius/aports](https://github.com/imagegenius/aports) to build glibc packages for `x86_64` and `aarch64` and are available in a [docker baseimage](https://github.com/imagegenius/docker-baseimage-alpine-glibc) and as alpine packages in the [imagegenius repo](https://packages.imagegenius.io/).
