@@ -90,12 +90,12 @@ pipeline {
             steps {
               echo "Running on node: ${NODE_NAME}"
               echo 'Build Image'
-              sh "docker build --tag ${IMAGE}:${META_TAG}:latest ."
+              sh "docker build --tag ${IMAGE}:${META_TAG} ."
               echo 'Build glibc'
               sh '''#!/bin/bash
                     docker run \
                       --rm --env EXT_RELEASE --env STDOUT=1 \
-                      ${IMAGE}:${META_TAG}:latest > glibc-bin-${EXT_RELEASE}-$(arch).tar.gz
+                      ${IMAGE}:${META_TAG} > glibc-bin-${EXT_RELEASE}-$(arch).tar.gz
                  '''
               echo 'Upload files to Github release'
               sh '''#!/bin/bash
@@ -113,7 +113,7 @@ pipeline {
                       rm ${DELETEFILE}
                     done
                     docker rmi \
-                      ${IMAGE}:${META_TAG}:latest || :
+                      ${IMAGE}:${META_TAG} || :
                  '''
             }
           }
