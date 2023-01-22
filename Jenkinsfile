@@ -64,7 +64,7 @@ pipeline {
              "tagger": {"name": "ImageGenius Jenkins","email": "ci@imagegenius.io","date": "'${GITHUB_DATE}'"}}' '''
         echo "Pushing New release for Tag"
         sh '''#!/bin/bash
-              echo "Updating to ${EXT_RELEASE}" > releasebody.json
+              echo "Updating to glibc `${EXT_RELEASE}`" > releasebody.json
               echo '{"tag_name":"'${META_TAG}'",\
                      "target_commitish": "main",\
                      "name": "'${META_TAG}'",\
