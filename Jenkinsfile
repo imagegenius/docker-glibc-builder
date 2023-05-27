@@ -10,7 +10,7 @@ pipeline {
   environment {
     BUILDS_DISCORD=credentials('build_webhook_url')
     GITHUB_TOKEN=credentials('github_token')
-    EXT_RELEASE = '2.35' // change glibc version here
+    EXT_RELEASE = '2.37' // change glibc version here
     IG_USER = 'imagegenius'
     IG_REPO = 'docker-glibc-builder'
     DOCKERHUB_IMAGE = 'imagegenius/glibc-builder'
@@ -148,12 +148,12 @@ pipeline {
       script{
         if (currentBuild.currentResult == "SUCCESS"){
           sh ''' curl -X POST -H "Content-Type: application/json" --data '{"avatar_url": "https://wiki.jenkins.io/JENKINS/attachments/2916393/57409617.png","embeds": [{"color": 1681177,\
-                 "description": "**'${IG_REPO}' Build '${BUILD_NUMBER}' ({{ ig_branch }})**\\n**Job:** '${RUN_DISPLAY_URL}'\\n"}],\
+                 "description": "**'${IG_REPO}' Build '${BUILD_NUMBER}'**\\n**Job:** '${RUN_DISPLAY_URL}'\\n"}],\
                  "username": "Jenkins"}' ${BUILDS_DISCORD} '''
         }
         else {
           sh ''' curl -X POST -H "Content-Type: application/json" --data '{"avatar_url": "https://wiki.jenkins.io/JENKINS/attachments/2916393/57409617.png","embeds": [{"color": 16711680,\
-                 "description": "**'${IG_REPO}' Build '${BUILD_NUMBER}' Failed! ({{ ig_branch }})**\\n**Job:** '${RUN_DISPLAY_URL}'\\n"}],\
+                 "description": "**'${IG_REPO}' Build '${BUILD_NUMBER}' Failed!**\\n**Job:** '${RUN_DISPLAY_URL}'\\n"}],\
                  "username": "Jenkins"}' ${BUILDS_DISCORD} '''
         }
       }
