@@ -10,7 +10,7 @@ pipeline {
   environment {
     BUILDS_DISCORD=credentials('build_webhook_url')
     GITHUB_TOKEN=credentials('github_token')
-    EXT_RELEASE = '2.37' // change glibc version here
+    EXT_RELEASE = '2.38' // change glibc version here
     IG_USER = 'imagegenius'
     IG_REPO = 'docker-glibc-builder'
     DOCKERHUB_IMAGE = 'imagegenius/glibc-builder'
